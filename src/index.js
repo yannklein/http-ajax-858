@@ -1,61 +1,53 @@
 // //////////////////////
 // Rehearsal
 // //////////////////////
-
-// // 1. Select the button
+// 1. Select an element (the button)
 // const button = document.querySelector("#click-me");
-// console.log(button);
-// // 2. Listen to a click 
+// // 2. Listen to a click
 // button.addEventListener("click", (event) => {
 //   console.log(event);
-//   // 3. Change the DOM, change content to Loading... and disable
-//   const clickedElement = event.currentTarget;
-//   clickedElement.innerText = "Loading...";
-//   clickedElement.disabled = true;
+//   // 3. Change the DOM (disable + change text)
+//   event.currentTarget.classList.add("disabled");
+//   event.currentTarget.innerText = "Loading...";
 // });
+
 
 // //////////////////////
 // HTTP GET request
 // //////////////////////
 
-// 1. Select elements (input, search, results list)
+// 1. Select elements (search button, input, list)
 const input = document.querySelector("#keyword");
-const search = document.querySelector("#submit");
-const results = document.querySelector("#results");
+const button = document.querySelector("#submit");
+const list = document.querySelector("#results");
 
-// 2. Listen to a click on the search button 
-search.addEventListener("click", (event) => {
-  // First, prevent default behavior (=page refresh) of the button
-  event.preventDefault();
-  console.log("Button Clicked!")
+// 2. Listen to a click on the button
+button.addEventListener("click", (event) => {
+  event.preventDefault(); // stop the default refresh from browser
   console.log(event);
-  // 2.5 Fetch an API (OmdbAPI)
-  const url = `https://www.omdbapi.com/?s=${input.value}&apikey=adf1f2d7`;
-  // const result = fetch(url) NO!
-  console.log("Starting to fetch (request)...")
+  const keyword = input.value;
+  const url = `https://www.omdbapi.com/?s=${keyword}&apikey=adf1f2d7`;
+  // 2.5 Fetch the OMdbAPI
+  // const data = fetch(url) // cannot do that!
+  console.log("before the fetch")
   fetch(url)
-    .then(resp => resp.json()) // json() turns the JSON into some JS object/array when response arrives
-    .then((data) => {
-      // Clean old movies
-      results.innerHTML = "";
-      // Everything below here is asynchronous, happens later
-      console.log("Fetch response arrived!!")
+    .then( response => response.json())
+    .then( (data) => {
+      console.log("the data arrives!")
       console.log(data.Search);
-      // 3. Change the DOM, display the movies inside the results list
-      const movies = data.Search;
-      movies.forEach((movie) => {
-        results.insertAdjacentHTML(
-          "beforeend",
+      list.innerHTML = ""; // clean up the ul list
+      data.Search.forEach((movie) => {
+        // 3. Display the movies in the list
+        list.insertAdjacentHTML(
+          "beforeend", 
           `<li class='list-inline-item'>
             <img src="${movie.Poster}" alt="" />
             <p>${movie.Title}</p>
-          </li>`
-        );
+          </li>`);
       });
     })
-    console.log("Do some other stuff after having sent the HTTP request (fetch)")
+  console.log("after the fetch")
 });
-
 
 
 // //////////////////////
@@ -65,15 +57,16 @@ const signUp = (event) => {
   event.preventDefault()
   const emailValue = document.getElementById("email").value
   const passwordValue = document.getElementById("password").value
+  const data = {
+    "email": emailValue, 
+    "password": passwordValue
+  };
   const url = "https://reqres.in/api/register";
-  const data = {"email": emailValue, "password": passwordValue};
-
   const options = {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify(data)
   }
-  
   fetch(url, options)
     .then(response => response.json())
     .then((data) => {
@@ -81,5 +74,7 @@ const signUp = (event) => {
     })
 }
 
+// 1. select the form 
 const form = document.querySelector("#form")
+// 2. listening to a submit event on the form
 form.addEventListener("submit", signUp)
